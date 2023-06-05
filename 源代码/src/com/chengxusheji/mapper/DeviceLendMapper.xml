@@ -1,0 +1,50 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.DeviceLendMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加设备借用记录 -->
+	<insert id="addDeviceLend" parameterType="deviceLend">
+		insert into t_deviceLend(deviceObj,teacherObj,lendUse,lendTime,returnTime) values 
+		(#{deviceObj.deviceNo},#{teacherObj.teacherNo},#{lendUse},#{lendTime},#{returnTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询设备借用记录 -->
+	<select id="queryDeviceLend" resultMap="deviceLendMap" >
+		select t_deviceLend.* from t_deviceLend,t_device,t_teacher ${where} and t_deviceLend.deviceObj = t_device.deviceNo and t_deviceLend.teacherObj = t_teacher.teacherNo limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="deviceLendMap" type="deviceLend">
+        <id property="deviceLendId" column="deviceLendId" />
+        <association property="deviceObj" column="deviceObj" select="com.chengxusheji.mapper.DeviceMapper.getDevice" />
+        <association property="teacherObj" column="teacherObj" select="com.chengxusheji.mapper.TeacherMapper.getTeacher" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有设备借用记录 -->
+	<select id="queryDeviceLendList" resultMap="deviceLendMap" >
+		select t_deviceLend.* from t_deviceLend,t_device,t_teacher ${where} and t_deviceLend.deviceObj = t_device.deviceNo and t_deviceLend.teacherObj = t_teacher.teacherNo
+	</select>
+
+    <!-- 按照查询条件的设备借用记录数 -->
+	<select id="queryDeviceLendCount" resultType="int">
+		select count(*) from t_deviceLend,t_device,t_teacher ${where} and t_deviceLend.deviceObj = t_device.deviceNo and t_deviceLend.teacherObj = t_teacher.teacherNo
+	</select>
+
+	<!-- 根据主键查询某个设备借用记录 -->
+	<select id="getDeviceLend" parameterType="int" resultMap="deviceLendMap">
+		select * from t_deviceLend where t_deviceLend.deviceLendId = #{deviceLendId}
+	</select>
+
+	<!-- 更新设备借用记录 -->
+	<update id="updateDeviceLend" parameterType="deviceLend">
+		update t_deviceLend set deviceObj=#{deviceObj.deviceNo},teacherObj=#{teacherObj.teacherNo},lendUse=#{lendUse},lendTime=#{lendTime},returnTime=#{returnTime} where deviceLendId = #{deviceLendId}
+	</update>
+
+	<!-- 删除设备借用记录 -->
+	<delete id="deleteDeviceLend" parameterType="int">
+		delete from t_deviceLend where deviceLendId=#{deviceLendId}
+	</delete>
+
+</mapper>

@@ -1,0 +1,50 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.LabOrderMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加实验室预约记录 -->
+	<insert id="addLabOrder" parameterType="labOrder">
+		insert into t_labOrder(labObj,teacherObj,orderDate,orderTime,purpose,shenHeState,reply) values 
+		(#{labObj.labNumber},#{teacherObj.teacherNo},#{orderDate},#{orderTime},#{purpose},#{shenHeState},#{reply})
+	</insert>
+
+	<!-- 按照查询条件分页查询实验室预约记录 -->
+	<select id="queryLabOrder" resultMap="labOrderMap" >
+		select t_labOrder.* from t_labOrder,t_labInfo,t_teacher ${where} and t_labOrder.labObj = t_labInfo.labNumber and t_labOrder.teacherObj = t_teacher.teacherNo limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="labOrderMap" type="labOrder">
+        <id property="orderId" column="orderId" />
+        <association property="labObj" column="labObj" select="com.chengxusheji.mapper.LabInfoMapper.getLabInfo" />
+        <association property="teacherObj" column="teacherObj" select="com.chengxusheji.mapper.TeacherMapper.getTeacher" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有实验室预约记录 -->
+	<select id="queryLabOrderList" resultMap="labOrderMap" >
+		select t_labOrder.* from t_labOrder,t_labInfo,t_teacher ${where} and t_labOrder.labObj = t_labInfo.labNumber and t_labOrder.teacherObj = t_teacher.teacherNo
+	</select>
+
+    <!-- 按照查询条件的实验室预约记录数 -->
+	<select id="queryLabOrderCount" resultType="int">
+		select count(*) from t_labOrder,t_labInfo,t_teacher ${where} and t_labOrder.labObj = t_labInfo.labNumber and t_labOrder.teacherObj = t_teacher.teacherNo
+	</select>
+
+	<!-- 根据主键查询某个实验室预约记录 -->
+	<select id="getLabOrder" parameterType="int" resultMap="labOrderMap">
+		select * from t_labOrder where t_labOrder.orderId = #{orderId}
+	</select>
+
+	<!-- 更新实验室预约记录 -->
+	<update id="updateLabOrder" parameterType="labOrder">
+		update t_labOrder set labObj=#{labObj.labNumber},teacherObj=#{teacherObj.teacherNo},orderDate=#{orderDate},orderTime=#{orderTime},purpose=#{purpose},shenHeState=#{shenHeState},reply=#{reply} where orderId = #{orderId}
+	</update>
+
+	<!-- 删除实验室预约记录 -->
+	<delete id="deleteLabOrder" parameterType="int">
+		delete from t_labOrder where orderId=#{orderId}
+	</delete>
+
+</mapper>

@@ -1,0 +1,48 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.DeviceMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加实验设备记录 -->
+	<insert id="addDevice" parameterType="device">
+		insert into t_device(deviceNo,deviceName,devicePhoto,devicePrice,stockCount,madePlace,outDate,deviceMemo) values 
+		(#{deviceNo},#{deviceName},#{devicePhoto},#{devicePrice},#{stockCount},#{madePlace},#{outDate},#{deviceMemo})
+	</insert>
+
+	<!-- 按照查询条件分页查询实验设备记录 -->
+	<select id="queryDevice" resultMap="deviceMap" >
+		select t_device.* from t_device ${where} limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="deviceMap" type="device">
+        <id property="deviceNo" column="deviceNo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有实验设备记录 -->
+	<select id="queryDeviceList" resultMap="deviceMap" >
+		select t_device.* from t_device ${where}
+	</select>
+
+    <!-- 按照查询条件的实验设备记录数 -->
+	<select id="queryDeviceCount" resultType="int">
+		select count(*) from t_device ${where}
+	</select>
+
+	<!-- 根据主键查询某个实验设备记录 -->
+	<select id="getDevice" parameterType="string" resultMap="deviceMap">
+		select * from t_device where t_device.deviceNo = #{deviceNo}
+	</select>
+
+	<!-- 更新实验设备记录 -->
+	<update id="updateDevice" parameterType="device">
+		update t_device set deviceName=#{deviceName},devicePhoto=#{devicePhoto},devicePrice=#{devicePrice},stockCount=#{stockCount},madePlace=#{madePlace},outDate=#{outDate},deviceMemo=#{deviceMemo} where deviceNo = #{deviceNo}
+	</update>
+
+	<!-- 删除实验设备记录 -->
+	<delete id="deleteDevice" parameterType="string">
+		delete from t_device where deviceNo=#{deviceNo}
+	</delete>
+
+</mapper>

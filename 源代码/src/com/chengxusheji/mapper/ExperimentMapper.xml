@@ -1,0 +1,50 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ExperimentMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加实验项目记录 -->
+	<insert id="addExperiment" parameterType="experiment">
+		insert into t_experiment(experimentName,classObj,labObj,experimentContent,experimentDate,experimentTime) values 
+		(#{experimentName},#{classObj.classNo},#{labObj.labNumber},#{experimentContent},#{experimentDate},#{experimentTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询实验项目记录 -->
+	<select id="queryExperiment" resultMap="experimentMap" >
+		select t_experiment.* from t_experiment,t_classInfo,t_labInfo ${where} and t_experiment.classObj = t_classInfo.classNo and t_experiment.labObj = t_labInfo.labNumber limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="experimentMap" type="experiment">
+        <id property="experimentId" column="experimentId" />
+        <association property="classObj" column="classObj" select="com.chengxusheji.mapper.ClassInfoMapper.getClassInfo" />
+        <association property="labObj" column="labObj" select="com.chengxusheji.mapper.LabInfoMapper.getLabInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有实验项目记录 -->
+	<select id="queryExperimentList" resultMap="experimentMap" >
+		select t_experiment.* from t_experiment,t_classInfo,t_labInfo ${where} and t_experiment.classObj = t_classInfo.classNo and t_experiment.labObj = t_labInfo.labNumber
+	</select>
+
+    <!-- 按照查询条件的实验项目记录数 -->
+	<select id="queryExperimentCount" resultType="int">
+		select count(*) from t_experiment,t_classInfo,t_labInfo ${where} and t_experiment.classObj = t_classInfo.classNo and t_experiment.labObj = t_labInfo.labNumber
+	</select>
+
+	<!-- 根据主键查询某个实验项目记录 -->
+	<select id="getExperiment" parameterType="int" resultMap="experimentMap">
+		select * from t_experiment where t_experiment.experimentId = #{experimentId}
+	</select>
+
+	<!-- 更新实验项目记录 -->
+	<update id="updateExperiment" parameterType="experiment">
+		update t_experiment set experimentName=#{experimentName},classObj=#{classObj.classNo},labObj=#{labObj.labNumber},experimentContent=#{experimentContent},experimentDate=#{experimentDate},experimentTime=#{experimentTime} where experimentId = #{experimentId}
+	</update>
+
+	<!-- 删除实验项目记录 -->
+	<delete id="deleteExperiment" parameterType="int">
+		delete from t_experiment where experimentId=#{experimentId}
+	</delete>
+
+</mapper>

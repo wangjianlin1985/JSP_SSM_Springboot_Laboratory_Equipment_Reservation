@@ -1,0 +1,49 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.LabInfoMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加实验室记录 -->
+	<insert id="addLabInfo" parameterType="labInfo">
+		insert into t_labInfo(labNumber,labName,labClassObj,labArea,labPhoto,labAddress,labState,labDesc) values 
+		(#{labNumber},#{labName},#{labClassObj.classId},#{labArea},#{labPhoto},#{labAddress},#{labState},#{labDesc})
+	</insert>
+
+	<!-- 按照查询条件分页查询实验室记录 -->
+	<select id="queryLabInfo" resultMap="labInfoMap" >
+		select t_labInfo.* from t_labInfo,t_labClass ${where} and t_labInfo.labClassObj = t_labClass.classId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="labInfoMap" type="labInfo">
+        <id property="labNumber" column="labNumber" />
+        <association property="labClassObj" column="labClassObj" select="com.chengxusheji.mapper.LabClassMapper.getLabClass" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有实验室记录 -->
+	<select id="queryLabInfoList" resultMap="labInfoMap" >
+		select t_labInfo.* from t_labInfo,t_labClass ${where} and t_labInfo.labClassObj = t_labClass.classId
+	</select>
+
+    <!-- 按照查询条件的实验室记录数 -->
+	<select id="queryLabInfoCount" resultType="int">
+		select count(*) from t_labInfo,t_labClass ${where} and t_labInfo.labClassObj = t_labClass.classId
+	</select>
+
+	<!-- 根据主键查询某个实验室记录 -->
+	<select id="getLabInfo" parameterType="string" resultMap="labInfoMap">
+		select * from t_labInfo where t_labInfo.labNumber = #{labNumber}
+	</select>
+
+	<!-- 更新实验室记录 -->
+	<update id="updateLabInfo" parameterType="labInfo">
+		update t_labInfo set labName=#{labName},labClassObj=#{labClassObj.classId},labArea=#{labArea},labPhoto=#{labPhoto},labAddress=#{labAddress},labState=#{labState},labDesc=#{labDesc} where labNumber = #{labNumber}
+	</update>
+
+	<!-- 删除实验室记录 -->
+	<delete id="deleteLabInfo" parameterType="string">
+		delete from t_labInfo where labNumber=#{labNumber}
+	</delete>
+
+</mapper>

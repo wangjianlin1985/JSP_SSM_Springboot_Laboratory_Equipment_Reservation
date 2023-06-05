@@ -1,0 +1,49 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.TeachTaskMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加教学任务记录 -->
+	<insert id="addTeachTask" parameterType="teachTask">
+		insert into t_teachTask(title,content,teacherObj,addTime) values 
+		(#{title},#{content},#{teacherObj.teacherNo},#{addTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询教学任务记录 -->
+	<select id="queryTeachTask" resultMap="teachTaskMap" >
+		select t_teachTask.* from t_teachTask,t_teacher ${where} and t_teachTask.teacherObj = t_teacher.teacherNo limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="teachTaskMap" type="teachTask">
+        <id property="taskId" column="taskId" />
+        <association property="teacherObj" column="teacherObj" select="com.chengxusheji.mapper.TeacherMapper.getTeacher" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有教学任务记录 -->
+	<select id="queryTeachTaskList" resultMap="teachTaskMap" >
+		select t_teachTask.* from t_teachTask,t_teacher ${where} and t_teachTask.teacherObj = t_teacher.teacherNo
+	</select>
+
+    <!-- 按照查询条件的教学任务记录数 -->
+	<select id="queryTeachTaskCount" resultType="int">
+		select count(*) from t_teachTask,t_teacher ${where} and t_teachTask.teacherObj = t_teacher.teacherNo
+	</select>
+
+	<!-- 根据主键查询某个教学任务记录 -->
+	<select id="getTeachTask" parameterType="int" resultMap="teachTaskMap">
+		select * from t_teachTask where t_teachTask.taskId = #{taskId}
+	</select>
+
+	<!-- 更新教学任务记录 -->
+	<update id="updateTeachTask" parameterType="teachTask">
+		update t_teachTask set title=#{title},content=#{content},teacherObj=#{teacherObj.teacherNo},addTime=#{addTime} where taskId = #{taskId}
+	</update>
+
+	<!-- 删除教学任务记录 -->
+	<delete id="deleteTeachTask" parameterType="int">
+		delete from t_teachTask where taskId=#{taskId}
+	</delete>
+
+</mapper>
